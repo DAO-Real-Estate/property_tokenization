@@ -2,7 +2,10 @@
 
 #[ink::contract]
 pub mod property_tokenization {
-    use ink::storage::Mapping;
+    use ink::{
+        storage::Mapping,
+        prelude::string::String,
+    };
 
     #[derive(scale::Decode, scale::Encode)]
     #[cfg_attr(
