@@ -7,6 +7,13 @@ pub mod property_tokenization {
         prelude::string::String,
     };
 
+    #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
+    #[cfg_attr(feature = "std", derive(::scale_info::TypeInfo))]
+    pub enum Error {
+        /// Wrapper, will get rid off
+        Undefinied,
+    }
+
     #[derive(scale::Decode, scale::Encode)]
     #[cfg_attr(
         feature = "std",
@@ -14,7 +21,7 @@ pub mod property_tokenization {
     )]
     pub struct Metadata {
         address: String,
-        area: u64,
+        area: u32,
         description: String,
     }
 
@@ -24,43 +31,34 @@ pub mod property_tokenization {
         derive(scale_info::TypeInfo, ink::storage::traits::StorageLayout)
     )]
     pub struct PropertyDetails {
-        owner: AccountId,
         total_tokens: u64,
         metadata: Metadata,
-        offered_ownership_percentage: u32,
+        total_offered_ownership_percentage: u8,
     }
 
     #[ink(storage)]
     pub struct PropertyTokenization {
         /// Stores the `AccountId` - owner of the properpty, along with the `PropertyDetails` for the given property
-        admin: AccountId,
         property: ink::storage::Mapping<AccountId, PropertyDetails>
     }
 
     impl PropertyTokenization {
-        /// Constructor that initializes the Property tokenization with the data input
+        /// Constructor that initializes the Property tokenization 
         #[ink(constructor)]
-        pub fn new(account_id: AccountId, property_details: PropertyDetails) -> Self {
+        pub fn new() -> Self {
             
-            let property_to_save = PropertyDetails {
-                owner: account_id,
-                total_tokens: property_details.total_tokens,
-                offered_ownership_percentage: property_details.offered_ownership_percentage,
-                metadata: property_details.metadata,
-            };
-
-            let mut mapping = Mapping::new();
-            mapping.insert(account_id, &property_to_save);
-
             Self {
-                admin: account_id,
-                property: mapping,
+                property: Mapping::default(),
             }
         }
 
+        /// adds new property into the storage of our contract
         #[ink(message)]
-        pub fn get_owner(&self) -> AccountId {
-            self.admin
+        pub fn add_new_property(&mut self, property_details: PropertyDetails) {
+            let caller = self.env().caller();
+            self.property.insert(caller, property_details);
         }
+
+        //todo implement selling tokens to other users
     }
 }
