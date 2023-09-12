@@ -2996,6 +2996,7 @@ dependencies = [
  "ink_e2e",
  "ink_prelude",
  "parity-scale-codec",
+ "rand 0.8.5",
  "scale-info",
 ]
 
