@@ -72,15 +72,29 @@ pub mod property_tokenization {
 
         /// adds new property into the storage of our contract
         #[ink(message)]
-        pub fn add_new_property(&mut self, property_details: PropertyDetails) -> Result<(), Error> {
-            // property_details should be send not as a struct, 
-            // but as parameters and then assembled 
+        pub fn add_new_property(
+            &mut self,
+            total_tokens: u64,
+            metadata: Metadata,
+            total_offered_ownership_percentage: u8,
+        ) -> Result<(), Error> {
+            let new_property = PropertyDetails {
+                // todo change to random
+                property_id: 1_u32,
+                total_tokens,
+                metadata,
+                total_offered_ownership_percentage,
+                is_verified: false,
+            };
+
+            // property_details should be send not as a struct,
+            // but as parameters and then assembled
             let caller = self.env().caller();
             let found_properties = self.property.get(caller);
 
             match found_properties {
                 Some(mut properties) => {
-                    properties.push(property_details);
+                    properties.push(new_property);
                     self.property.insert(caller, &properties);
                 }
                 None => return Err(Error::NoSuchOwner),
@@ -121,14 +135,18 @@ pub mod property_tokenization {
     mod tests {
         use super::*;
         use rand;
-        
+
         #[ink::test]
         fn default_works() {
-            // make it private func and use it instead
-            let rng = rand::random::<[u8; 32]>();
-
-            let contract = PropertyTokenization::init(AccountId::from(rng));
+            let contract = PropertyTokenization::init(AccountId::from(get_random::<[u8; 32]>()));
             dbg!(&contract);
+        }
+
+        fn get_random<T: Default>() -> T
+        where
+            rand::distributions::Standard: rand::distributions::Distribution<T>,
+        {
+            rand::random::<T>()
         }
     }
 }
