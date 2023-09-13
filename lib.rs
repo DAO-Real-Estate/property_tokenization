@@ -87,8 +87,6 @@ pub mod property_tokenization {
                 is_verified: false,
             };
 
-            // property_details should be send not as a struct,
-            // but as parameters and then assembled
             let caller = self.env().caller();
             let found_properties = self.property.get(caller);
 
