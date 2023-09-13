@@ -63,7 +63,7 @@ pub mod property_tokenization {
     impl PropertyTokenization {
         /// Constructor that initializes the Property tokenization
         #[ink(constructor)]
-        pub fn new(admin: AccountId) -> Self {
+        pub fn init(admin: AccountId) -> Self {
             Self {
                 admin,
                 property: Mapping::default(),
@@ -73,6 +73,8 @@ pub mod property_tokenization {
         /// adds new property into the storage of our contract
         #[ink(message)]
         pub fn add_new_property(&mut self, property_details: PropertyDetails) -> Result<(), Error> {
+            // property_details should be send not as a struct, 
+            // but as parameters and then assembled 
             let caller = self.env().caller();
             let found_properties = self.property.get(caller);
 
@@ -122,9 +124,10 @@ pub mod property_tokenization {
         
         #[ink::test]
         fn default_works() {
+            // make it private func and use it instead
             let rng = rand::random::<[u8; 32]>();
 
-            let contract = PropertyTokenization::new(AccountId::from(rng));
+            let contract = PropertyTokenization::init(AccountId::from(rng));
             dbg!(&contract);
         }
     }
