@@ -6,6 +6,7 @@ pub mod property_tokenization {
         prelude::{string::String, vec::Vec},
         storage::Mapping,
     };
+    use ink_env::{hash, hash_bytes};
 
     /// Custom type for the property id
     pub type PropertyId = u32;
@@ -80,7 +81,7 @@ pub mod property_tokenization {
         ) -> Result<(), Error> {
             let new_property = PropertyDetails {
                 // todo change to random
-                property_id: 1_u32,
+                property_id: 5u32,
                 total_tokens,
                 metadata,
                 total_offered_ownership_percentage,
@@ -96,9 +97,17 @@ pub mod property_tokenization {
                     self.property.insert(caller, &properties);
                 }
                 None => return Err(Error::NoSuchOwner),
-            }
+            };
 
             Ok(())
+        }
+
+        #[ink(message)]
+        pub fn xtest(&self) {
+            let block_num = self.env().block_number();
+            let block_time = self.env().block_timestamp();
+            dbg!(block_num);
+            dbg!(block_time);
         }
 
         #[ink(message)]
@@ -132,7 +141,16 @@ pub mod property_tokenization {
     #[cfg(test)]
     mod tests {
         use super::*;
+        use ink_env::hash::{Sha2x256, HashOutput};
         use rand;
+
+        #[ink::test]
+        fn xtest() {
+            let input = &[1, 2, 4];
+            let mut output = <Sha2x256 as HashOutput>::Type::default();
+            ink_env::hash_bytes::<Sha2x256>(input, &mut output);
+            dbg!(output);
+        }
 
         #[ink::test]
         fn default_works() {
