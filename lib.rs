@@ -8,7 +8,7 @@ pub mod property_tokenization {
     };
     use ink_env::{hash, hash_bytes};
 
-    /// Custom type for the property id
+    /// Custom type for property id
     pub type PropertyId = u32;
 
     #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
